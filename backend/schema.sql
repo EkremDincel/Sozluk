@@ -1,1 +1,1 @@
-CREATE TABLE IF NOT EXISTS users (salt BLOB, hash BLOB, name TEXT, email TEXT);
+CREATE TABLE IF NOT EXISTS users (hash BLOB, name TEXT, email TEXT);

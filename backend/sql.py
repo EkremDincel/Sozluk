@@ -39,6 +39,16 @@ def init(app):
             db.cursor().executescript(f.read())
         db.commit()
 
-##@public
-##def register_user():
-##    
+@public
+def register_user(name, password, email):
+    if not find_user(name):
+        pwhash = bcrypt.hashpw(password, bcrypt.gensalt())
+        get_cursor().execute('INSERT INTO users (?, ?, ?)', (pwhash, name, email))
+        return True
+    return False
+
+@public
+def find_user(name):
+    return get_cursor().execute('SELECT * FROM users WHERE name = ?', (name,)).fetch_one()    
+    
+    
