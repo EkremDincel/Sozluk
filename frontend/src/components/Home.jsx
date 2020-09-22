@@ -37,7 +37,6 @@ var example_data = [
 function generate_row(data) {
     return (
         <tr>
-            <td>{data.id}</td>
             <td>{data.title}</td>
             <td>{data.date}</td>
         </tr>
@@ -52,7 +51,6 @@ export default function Home() {
             <Table striped bordered hover>
                 <thead>
                     <tr>
-                        <th>#</th>
                         <th>Baslik</th>
                         <th>Tarih</th>
                     </tr>
