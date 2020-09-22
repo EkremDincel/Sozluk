@@ -1,7 +1,10 @@
 from flask import Flask
 from flask import request
+import sql
 
 app = Flask(__name__)
+sql.register_close(app)
+sql.init(app)
 
 @app.route('/')
 def index():
