@@ -18,7 +18,7 @@ import {
   FormControl,
   Container,
 } from 'react-bootstrap';
-import Home from './Home.jsx';
+import Home from './components/Home.jsx';
 
 function App() {
   return (
