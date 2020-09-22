@@ -18,7 +18,7 @@ import {
   FormControl,
   Container,
 } from 'react-bootstrap';
-import Home from './Home.jsx';
+import Home from './components/Home.jsx';
 
 function App() {
   return (
@@ -29,13 +29,9 @@ function App() {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="mr-auto">
               <Nav.Link href="#">Ana Sayfa</Nav.Link>
-              <Nav.Link href="#link">Link</Nav.Link>
-              <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-                <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-                <NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>
-                <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-                <NavDropdown.Divider />
-                <NavDropdown.Item href="#action/3.4">Separated link</NavDropdown.Item>
+              <NavDropdown title="Hesap" id="basic-nav-dropdown">
+                <NavDropdown.Item href="#action/3.1">Giris Yap</NavDropdown.Item>
+                <NavDropdown.Item href="#action/3.2">Kaydol</NavDropdown.Item>
               </NavDropdown>
             </Nav>
             <Form inline>
