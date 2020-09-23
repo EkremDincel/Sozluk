@@ -1,4 +1,4 @@
-# BIR TOPIC'E TIKLANDIGINDA
+# Bir Topic'e Tiklanirsa
 ```flask/topic_detail/TOPIC_NAME_ENCODED``` url'ine istek yapilir.
 
 ## RESPONSE
