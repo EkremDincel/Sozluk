@@ -1,7 +1,9 @@
 # Bir Topic'e Tiklanirsa
-```flask/topic_detail/TOPIC_NAME_ENCODED``` url'ine istek yapilir.
 
-## RESPONSE
+### URL
+```flask/topic_detail/TOPIC_NAME_ENCODED```
+
+### RESPONSE
 
 ```
 {
@@ -28,7 +30,7 @@ entries: [
 
 ```flask/topic_list```
 
-## Response
+### Response
 
 ```
 [
