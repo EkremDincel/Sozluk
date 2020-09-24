@@ -18,17 +18,17 @@ import {
   FormControl,
   Container,
 } from 'react-bootstrap';
-import Home from './components/Home.jsx';
+import Home from './components/Home/Home.jsx';
 
 function App() {
   return (
     <Router>
         <Navbar bg="primary" expand="lg" variant='dark'>
-          <Navbar.Brand href="#home">Sozluk</Navbar.Brand>
+          <Navbar.Brand href="/">Sozluk</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="mr-auto">
-              <Nav.Link href="#">Ana Sayfa</Nav.Link>
+              <Nav.Link href="/">Ana Sayfa</Nav.Link>
               <NavDropdown title="Hesap" id="basic-nav-dropdown">
                 <NavDropdown.Item href="#action/3.1">Giris Yap</NavDropdown.Item>
                 <NavDropdown.Item href="#action/3.2">Kaydol</NavDropdown.Item>
@@ -42,7 +42,12 @@ function App() {
         </Navbar>
 
         <Switch>
-          <Route exact path="/" component={Home}/>
+          <Route exact path="/">
+            <Home opentopic={false}/>
+          </Route>
+          <Route path="/topics/:name">
+            <Home opentopic={true}/>
+          </Route>
         </Switch>
     </Router>
   );
