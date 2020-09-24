@@ -22,5 +22,25 @@ entries: [
 ]
 }
 ```
+# Tum Topicleri Alma
 
+### URL
+
+```flask/topic_list```
+
+## Response
+
+```
+[
+{
+    id: 1,
+    title: 'baslik',
+},
+{
+    id: 2,
+    title: 'baslik',
+},
+...
+]
+```
 
