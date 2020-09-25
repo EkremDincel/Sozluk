@@ -5,3 +5,11 @@ td {
 .main {
   margin-top: auto;
 }
+
+.card {
+  margin-bottom: 10px;
+}
+
+.entry-username {
+  text-align: right !important;
+}
