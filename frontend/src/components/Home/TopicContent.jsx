@@ -20,6 +20,12 @@ var example_data = [
     user: 'admin',
     date: '9.03.2021 Cuma',
   },
+  {
+    id: 4,
+    content: 'Basit bir deneme',
+    user: 'admin',
+    date: '8.03.2021 Cuma',
+  },
 ];
 
 function generate_entry(data) {
