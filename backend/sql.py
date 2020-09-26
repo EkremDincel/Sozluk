@@ -5,9 +5,12 @@ import hashlib
 import datetime
 import bcrypt # https://github.com/pyca/bcrypt/
 
-class TopicNotExists(ValueError): pass
-class UserNotExists(ValueError): pass
-class UserAlreadyExists(ValueError): pass
+class TopicNotExists(ValueError):
+    "Raises when requested topic not exists."
+class UserNotExists(ValueError):
+    "Raises when requested user not exists."
+class UserAlreadyExists(ValueError):
+    "Raises when trying to register a user with already existing name."
 
 __all__ = []
 def public(f):
@@ -42,6 +45,7 @@ def register_close(app):
 
 @public
 def init(app):
+    "Initialize the database."
     with app.app_context():
         db = get_db()
         with app.open_resource('schema.sql', mode='r') as f:
@@ -50,6 +54,9 @@ def init(app):
 
 @public
 def register_user(name: str, password: str, email: str):
+    """Register a new user.
+Raises [UserAlreadyExists] if user name is not available.
+Returns [None]."""
     if not find_user(name):
         pwhash = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
         get_cursor().execute('INSERT INTO users VALUES (?, ?, ?)', (pwhash, name, email))
@@ -58,7 +65,9 @@ def register_user(name: str, password: str, email: str):
 
 @public
 def confirm_user(name: str, password: str):
-    user = find_user(name)
+    """Confirm a user and their password.
+Raises [UserNotExists] if [name] or [password] is wrong."""
+    user = find_user(name) 
     if user:
         if bcrypt.checkpw(password.encode(), user["hash"]):
             return user            
@@ -66,28 +75,34 @@ def confirm_user(name: str, password: str):
 
 @public
 def find_user(name: str):
+    "Find the user by name [name] and return."
     return get_cursor().execute('SELECT rowid, * FROM users WHERE name = ?', (name,)).fetchone()    
 
 @public
 def get_topic_id(topic_name: str):
+    """Get the rowid of topic which named [topic_id].
+Raises [TopicNotExists] if topic do not exists."""
     topic_id = get_cursor().execute('SELECT rowid FROM topics WHERE name = ?', (topic_name,)).fetchone()
     if topic_id is None:
         raise TopicNotExists()
     return topic_id["rowid"]
 
 def update_entry_count_of_topic(topic_id: int):
+    """Increase [entry_count] column of topic row which has [rowid] of [topic_id] by one and return the new [entry_count] value."""
     cursor = get_cursor()
     new_id = cursor.execute("SELECT entry_count FROM topics WHERE rowid = ?", (topic_id,)).fetchone()["entry_count"] + 1
     cursor.execute("UPDATE topics SET entry_count = ?", (new_id,))
     return new_id
 
 def crate_topic(topic_name: str, entry_count: int) -> int:
+    """Create a new topic named [topic_name] which has [entry_count] entries. Returns the [rowid] of newly added topic."""
     cursor = get_cursor()
     cursor.execute("INSERT INTO topics VALUES (?, ?)", (topic_name, entry_count))
     return cursor.execute("SELECT last_insert_rowid()").fetchone()
 
 @public
 def add_entry_to_topic(topic_name: str, user_name: str, user_password: str, content: str):
+    """Add a new entry to the topic."""
     user_id = confirm_user(user_name, user_password)["rowid"]
     try:
         topic_id = get_topic_id(topic_name)
@@ -103,6 +118,7 @@ def add_entry_to_topic(topic_name: str, user_name: str, user_password: str, cont
 
 @public
 def get_topic_entries(topic_name: str, start: int, count: int):
+    """Get the entries of a topic."""
     topic_id = get_topic_id(topic_name)
     entries = get_cursor().execute("""SELECT
                                         user.name,
