@@ -26,7 +26,7 @@ def signin():
 
 @app.route('/topic/<topic_name>')
 def topic(topic_name):
-    return topic_name
+    sql.
 
 @app.route('/user/<user_name>')
 def user(user_name):

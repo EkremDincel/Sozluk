@@ -2,7 +2,12 @@ import sqlite3
 from flask import g
 import os
 import hashlib
+import datetime
 import bcrypt # https://github.com/pyca/bcrypt/
+
+class TopicNotExists(ValueError): pass
+class UserNotExists(ValueError): pass
+class UserAlreadyExists(ValueError): pass
 
 __all__ = []
 def public(f):
@@ -23,12 +28,16 @@ def get_db():
 def get_cursor():
     return get_db().cursor()
 
+def get_rowid_of_table(table: str):
+    return get_cursor().execute('SELECT seq FROM sqlite_sequence WHERE name=?', (table, ))["seq"]
+
 @public
 def register_close(app):
     @app.teardown_appcontext
     def close_connection(exception):
         db = getattr(g, '_database', None)
         if db is not None:
+            db.commit()
             db.close()
 
 @public
@@ -40,15 +49,79 @@ def init(app):
         db.commit()
 
 @public
-def register_user(name, password, email):
+def register_user(name: str, password: str, email: str):
     if not find_user(name):
-        pwhash = bcrypt.hashpw(password, bcrypt.gensalt())
-        get_cursor().execute('INSERT INTO users (?, ?, ?)', (pwhash, name, email))
-        return True
-    return False
+        pwhash = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+        get_cursor().execute('INSERT INTO users VALUES (?, ?, ?)', (pwhash, name, email))
+        return
+    raise UserAlreadyExists()
 
 @public
-def find_user(name):
-    return get_cursor().execute('SELECT * FROM users WHERE name = ?', (name,)).fetch_one()    
-    
-    
+def confirm_user(name: str, password: str):
+    user = find_user(name)
+    if user:
+        if bcrypt.checkpw(password.encode(), user["hash"]):
+            return user            
+    raise UserNotExists()
+
+@public
+def find_user(name: str):
+    return get_cursor().execute('SELECT rowid, * FROM users WHERE name = ?', (name,)).fetchone()    
+
+@public
+def get_topic_id(topic_name: str):
+    topic_id = get_cursor().execute('SELECT rowid FROM topics WHERE name = ?', (topic_name,)).fetchone()
+    if topic_id is None:
+        raise TopicNotExists()
+    return topic_id["rowid"]
+
+def update_entry_count_of_topic(topic_id: int):
+    cursor = get_cursor()
+    new_id = cursor.execute("SELECT entry_count FROM topics WHERE rowid = ?", (topic_id,)).fetchone()["entry_count"] + 1
+    cursor.execute("UPDATE topics SET entry_count = ?", (new_id,))
+    return new_id
+
+def crate_topic(topic_name: str, entry_count: int) -> int:
+    cursor = get_cursor()
+    cursor.execute("INSERT INTO topics VALUES (?, ?)", (topic_name, entry_count))
+    return cursor.execute("SELECT last_insert_rowid()").fetchone()
+
+@public
+def add_entry_to_topic(topic_name: str, user_name: str, user_password: str, content: str):
+    user_id = confirm_user(user_name, user_password)["rowid"]
+    try:
+        topic_id = get_topic_id(topic_name)
+    except TopicNotExists:
+        entry_index = 0
+        topic_id = crate_topic(topic_name, entry_index)
+    else:
+        entry_index = update_entry_count_of_topic(topic_id)
+    date = datetime.datetime.now()
+    today = ".".join(map(str, (date.year, date.month, date.day))) + " " + str(date.hour) + ":" + str(date.minute)
+    get_cursor().execute("INSERT INTO entries VALUES (?, ?, ?, ?, ?)", (user_id, topic_id, entry_index, today, content))
+        
+
+@public
+def get_topic_entries(topic_name: str, start: int, count: int):
+    topic_id = get_topic_id(topic_name)
+    entries = get_cursor().execute("""SELECT
+                                        user.name,
+                                        entry_date,
+                                        content
+                                    FROM entries
+                                    LEFT JOIN users user ON
+                                        user.rowid = user_id
+                                    WHERE ( ? > entry_index > ? AND topic_id = ? )""", (start, count, topic_id)).fetchall()
+    return dict(entries)
+
+if __name__ == "__main__":
+    from flask import Flask
+    app = Flask(__name__)
+    register_close(app)
+    with app.app_context():
+        init(app)
+        add_entry_to_topic("python", "ekrem", "şifrem", "bir dil.")
+        a=get_topic_entries("python",0,1)
+
+
+
