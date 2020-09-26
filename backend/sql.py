@@ -112,7 +112,8 @@ def add_entry_to_topic(topic_name: str, user_name: str, user_password: str, cont
     else:
         entry_index = update_entry_count_of_topic(topic_id)
     date = datetime.datetime.now()
-    today = ".".join(map(str, (date.year, date.month, date.day))) + " " + str(date.hour) + ":" + str(date.minute)
+    # fix padding of the months and days
+    today = ".".join(map(str, (date.year, date.month, date.day))) + " " + str(date.hour).zfill(2) + ":" + str(date.minute).zfill(2)
     get_cursor().execute("INSERT INTO entries VALUES (?, ?, ?, ?, ?)", (user_id, topic_id, entry_index, today, content))
         
 
