@@ -43,7 +43,7 @@ export default class TopicContent extends React.Component {
       <React.Fragment>
         <h1>{this.decoded}</h1>
 
-        {example_data.map(generate_entry)}
+        {this.props.data.map(generate_entry)}
       </React.Fragment>
     )
   }
@@ -51,12 +51,11 @@ export default class TopicContent extends React.Component {
   constructor(props) {
     super(props);
     var name = window.location.pathname.split('/')[2];
-    if(name==undefined){
+    if(name===undefined){
       this.decoded = 'Merhaba!';
     }
     else{
       this.decoded = decodeURIComponent(name);
     }
-    console.log(name);
   }
 }

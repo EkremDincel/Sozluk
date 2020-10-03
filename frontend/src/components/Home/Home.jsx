@@ -5,38 +5,11 @@ import {
 import React from 'react';
 import './Home.css';
 import TopicList from './TopicList.jsx';
-import TopicContent from './TopicContent.jsx';
 import {
   withRouter,
+  useLocation,
 } from 'react-router-dom';
-import ReactPaginate from 'react-paginate';
-
-var example_data = [
-  {
-    id: 1,
-    content: 'Lorem Ipsum Dolor Sit Amet',
-    user: 'ramazanemre',
-    date: '12.03.2021 Pazar'
-  },
-  {
-    id: 2,
-    content: 'Basit bir deneme',
-    user: 'admin',
-    date: '10.03.2021 Cuma',
-  },
-  {
-    id: 3,
-    content: 'Basit bir deneme',
-    user: 'admin',
-    date: '9.03.2021 Cuma',
-  },
-  {
-    id: 4,
-    content: 'Basit bir deneme',
-    user: 'admin',
-    date: '8.03.2021 Cuma',
-  },
-];
+import Pagination from './Pagination.jsx';
 
 
 class Home extends React.Component {
@@ -49,7 +22,7 @@ class Home extends React.Component {
           </Col>
 
           <Col sm={6}>
-            <TopicContent data={example_data}/>
+            <Pagination/>
           </Col>
         </Row>
       </div>
@@ -58,6 +31,8 @@ class Home extends React.Component {
 
   clicked(title) {
     var encoded = encodeURIComponent(title);
+    console.log(encoded);
+
     window.location.pathname = '/topics/' + encoded;
 
   }
@@ -71,6 +46,7 @@ class Home extends React.Component {
     else {
       this.topic = false;
     }
+    this.clicked = this.clicked.bind(this);
   }
 }
 
